@@ -102,7 +102,6 @@ def setAttenuation(atten_value=0):
     
         
 if __name__=='__main__':
-    import time
     '''
     example usage
     '''
@@ -124,14 +123,4 @@ if __name__=='__main__':
     setAttenuation(63)
     
     
-    '''
-    print io.getmode()
-    io.setmode(io.BOARD)
-    io.setup(7, io.OUT)
-    while True:
-        io.output(7,io.LOW)
-        time.sleep(0.001)
-        io.output(7,io.HIGH)
-        time.sleep(0.001)
-    '''
     
