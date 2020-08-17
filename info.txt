@@ -1,0 +1,42 @@
+useful I2C bus info for the rno-g cal. driver board:
+
+i2c I/O expander: TCA9534A
+
+I/O chip at 0x20 or 0x38:
+PO == attenuator load enable
+P1 == select out switch 0
+P2 == attenuator d5
+P3 == attenuator d4
+P4 == attenuator d3
+P5 == attenuator d2
+P6 == attenuator d1
+P7 == attenuator d0
+##
+I/O chip at 0x27 or 0x3f:
+PO == n/a
+P1 == n/a
+P2 == n/a
+P3 == vco enable
+P4 == n/a
+P5 == select out switch 1
+P6 == select source switch 
+P7 == select out switch 2
+##
+source switch =1 --> pulser select
+source switch =0 --> vco select
+
+output on coaxial --> out switch 0 = 0
+             	      out switch 1 = don't care
+             	      out switch 2 = 0
+
+output on rfof1   -->  TODO
+
+output on rfof2   -->  TODO
+    
+    
+####pulser edge input:
+BBB gpio_47 selects 'pps source' (either BBB [0] or GPS [1])
+        gpio_47 is pulled to 2.5V to select GPS PPS as default
+	in normal field operation, set gpio_47 to a highZ input
+
+BBB gpio_66 is the alternative PPS signal from the cpu
