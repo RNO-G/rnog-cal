@@ -29,10 +29,13 @@ output on coaxial --> out switch 0 = 0
              	      out switch 1 = don't care
              	      out switch 2 = 0
 
-output on rfof1   -->  TODO
-
-output on rfof2   -->  TODO
-    
+output on rfof1   -->  out switch 0 = 0
+                       out switch 1 = don't care
+		       out switch 2 = 1
+		       
+output on rfof2   -->  out switch 0 = 1
+       	  	       out switch 1 = 0
+		       out switch 2 = don't care
     
 ####pulser edge input:
 BBB gpio_47 selects 'pps source' (either BBB [0] or GPS [1])

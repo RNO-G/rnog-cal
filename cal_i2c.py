@@ -77,6 +77,14 @@ def setOutput(select):
         write(adr0, output_reg, ret[0] & (~0x02)) #set out switch 0 to 0
         write(adr1, output_reg, ret[1] & (~0x80)) #set out switch 2 to 0
 
+    elif select == 2:
+        write(adr0, output_reg, ret[0] & (~0x02)) #set out switch 0 to 0
+        write(adr1, output_reg, ret[1] | (0x80)) #set out switch 2 to 1
+
+    elif select == 3:
+        write(adr0, output_reg, ret[0] | (0x02)) #set out switch 0 to 1
+        write(adr1, output_reg, ret[1] & (0x20)) #set out switch 1 to 0        
+        
     else:
         print 'Nothing was changed'
 
@@ -85,14 +93,18 @@ def setOutput(select):
 
 def setAttenuation(atten_value=0):
     '''
+    parallel loading into SKY12347: 6-bit step attenuator up to 31.5dB
+
     0 = most atten
     63 = least atten
-    needs some re-arranging to be monotonic in these units
+    atten_value is bit-reversed before loading (to match schematic)
     '''
     
     ret = getOutputRegisterValue()
 
-    atten_bits = (atten_value & 0x3F) << 2
+    atten_value_reversed = int('{:06b}'.format(atten_value)[::-1],2)
+    
+    atten_bits = (atten_value_reversed & 0x3F) << 2
 
     new_reg_value = atten_bits | (ret[0] & 0x02)
 
@@ -112,6 +124,9 @@ if __name__=='__main__':
     ##set coax output
     setOutput(1)
 
+    ##set RFoF 2 output
+    #setOutput(3)
+    
     ##enable VCO 
     #enableVCO(True)
 
@@ -120,7 +135,7 @@ if __name__=='__main__':
 
     
     ##set attenuation level
-    setAttenuation(63)
+    setAttenuation(31)
     
     
     
