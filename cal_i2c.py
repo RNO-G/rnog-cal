@@ -149,6 +149,8 @@ if __name__=='__main__':
     
     ##setup board
     setup() 
+
+    ##read temperature
     getTemp()
     
     ##set coax output
