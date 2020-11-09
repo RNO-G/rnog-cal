@@ -133,7 +133,7 @@ def getTemp(verbose=True):
     ##greater than 0degC-->
     if temp_sign < 1:
         temp = temp
-    ##less then 0degC-->
+    ##less than 0degC-->
     else:
         temp = 256.-temp    
 
