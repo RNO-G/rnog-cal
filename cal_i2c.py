@@ -95,8 +95,6 @@ def setOutput(select):
     else:
         print 'Nothing was changed'
 
-    ##TODO, finish this function
-
 
 def setAttenuation(atten_value=0):
     '''
