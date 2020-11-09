@@ -5,6 +5,7 @@ bus = smbus.SMBus(2) #i2c2 is used on the BBB
 
 adr0 = 0x38
 adr1 = 0x3f
+adr2 = 0x18 #tmp sensor
 
 output_reg = 0x01
 config_reg = 0x03
@@ -22,6 +23,12 @@ def read(i2c_address, register):
     read_data = bus.read_byte_data(i2c_address, register)
 
     return read_data
+
+def readBlock(i2c_address, register, num_bytes=2):
+
+    read_block_data = bus.read_i2c_block_data(i2c_address, register, num_bytes)
+
+    return read_block_data
 
 def setup():
     '''
@@ -111,7 +118,29 @@ def setAttenuation(atten_value=0):
     write(adr0, output_reg, new_reg_value)
     write(adr0, output_reg, new_reg_value | 0x01) #toggle load enable
     write(adr0, output_reg, new_reg_value)
-    
+
+def getTemp(verbose=True):
+    '''
+    read local temperature sensor (MCP9804)
+    probably could be more complicated, but seems to work..
+    see datasheet for more information
+    '''
+    raw = readBlock(adr2, 0x05) #2-byte read
+    temp_sign = raw[0] & 0x10
+
+    temp = (raw[0] & 0xF) * 2**4 + raw[1] * 2**(-4)
+
+    ##greater than 0degC-->
+    if temp_sign < 1:
+        temp = temp
+    ##less then 0degC-->
+    else:
+        temp = 256.-temp    
+
+    if verbose:
+        print 'Board temp:', temp, 'degC'
+
+    return temp
         
 if __name__=='__main__':
     '''
@@ -120,12 +149,13 @@ if __name__=='__main__':
     
     ##setup board
     setup() 
-
+    getTemp()
+    
     ##set coax output
-    setOutput(1)
+    #setOutput(1)
 
     ##set RFoF 2 output
-    #setOutput(3)
+    setOutput(3)
     
     ##enable VCO 
     #enableVCO(True)
@@ -135,7 +165,7 @@ if __name__=='__main__':
 
     
     ##set attenuation level
-    setAttenuation(31)
+    setAttenuation(48)
     
     
     
