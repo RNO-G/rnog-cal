@@ -133,8 +133,9 @@ def getTemp(verbose=True):
         temp = temp
     ##less than 0degC-->
     else:
-        temp = 256.-temp    
-
+        #temp = 256.-temp    
+        temp = temp-256.
+        
     if verbose:
         print 'Board temp:', temp, 'degC'
 
