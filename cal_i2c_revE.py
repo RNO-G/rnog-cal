@@ -4,6 +4,16 @@ import sys
 
 bus = smbus.SMBus(2) #i2c2 is used on the BBB
 
+# check rev 
+
+revF = False
+try: 
+    with open("/REV") as f:
+       revF =  f.read() == "F"
+
+except e:
+    pass 
+
 adr0 = 0x38
 adr1 = 0x3f
 adr2 = 0x18 #tmp sensor
@@ -100,7 +110,7 @@ def setOutput(select):
         write(adr1, output_reg, (ret[1] & (0x2F)) & (~0x04)) #set out switch 1 to 0, turn rfof bias2 on (active low)        
         
     else:
-        print 'Nothing was changed'
+        print('Nothing was changed')
 
 
 def setAttenuation(atten_value=0):
@@ -129,7 +139,10 @@ def getTemp(verbose=True):
     read local temperature sensor (MCP9804)
     probably could be more complicated, but seems to work..
     see datasheet for more information
+
+    note: on revF, temp sensor is gone
     '''
+
     raw = readBlock(adr2, 0x05) #2-byte read
     temp_sign = raw[0] & 0x10
 
@@ -144,7 +157,7 @@ def getTemp(verbose=True):
         temp = temp-256.
         
     if verbose:
-        print 'Board temp:', temp, 'degC'
+        print('Board temp:', temp, 'degC')
 
     return temp
         

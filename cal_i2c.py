@@ -93,7 +93,7 @@ def setOutput(select):
         write(adr1, output_reg, ret[1] & (0x20)) #set out switch 1 to 0        
         
     else:
-        print 'Nothing was changed'
+        print('Nothing was changed')
 
 
 def setAttenuation(atten_value=0):
@@ -137,7 +137,7 @@ def getTemp(verbose=True):
         temp = temp-256.
         
     if verbose:
-        print 'Board temp:', temp, 'degC'
+        print('Board temp:', temp, 'degC')
 
     return temp
         
