@@ -1,6 +1,7 @@
 import smbus
 import math
 import sys
+import time
 
 bus = smbus.SMBus(1) #i2c2 is used on the BBB
 
@@ -16,7 +17,8 @@ except e:
 
 adr0 = 0x38
 adr1 = 0x3f
-#adr2 = 0x18 #tmp sensor
+TEMP_ADDR = 0x19 #tmp sensor
+HUM_ADDR = 0x40 #humidity sensor
 
 output_reg = 0x01
 config_reg = 0x03
@@ -133,6 +135,57 @@ def setAttenuation(atten_value=0):
     write(adr0, output_reg, new_reg_value | 0x01) #toggle load enable
     write(adr0, output_reg, new_reg_value)
         
+def getTemp(verbose=True):
+    '''
+    read local temperature sensor (MCP9804)
+    probably could be more complicated, but seems to work..
+    see datasheet for more information
+
+    note: on revF, temp sensor is gone
+    '''
+
+    raw = readBlock(TEMP_ADDR, 0x05) #2-byte read
+    temp_sign = raw[0] & 0x10
+
+    temp = (raw[0] & 0xF) * 2**4 + raw[1] * 2**(-4)
+
+    ##greater than 0degC-->
+    if temp_sign < 1:
+        temp = temp
+    ##less than 0degC-->
+    else:
+        #temp = 256.-temp    
+        temp = temp-256.
+        
+    if verbose:
+        print('Board temp:', temp, 'degC')
+
+    return temp
+
+
+def read_humidity():
+    TRIGGER_HUMIDITY_MEASURE_NO_HOLD = 0xF5
+
+    # Send humidity measurement command
+    bus.write_byte(HUM_ADDR, TRIGGER_HUMIDITY_MEASURE_NO_HOLD)
+
+    # Wait for conversion (~20ms typical)
+    time.sleep(0.05)
+
+    # Read 3 bytes: MSB, LSB, CRC
+    data = readBlock(HUM_ADDR, 0x00, 3)
+
+    raw = (data[0] << 8) | data[1]
+
+    # Clear status bits
+    raw &= 0xFFFC
+
+    # Convert to %RH using datasheet formula
+    humidity = -6 + (125.0 * raw / 65536.0)
+
+    return humidity
+
+
 if __name__=='__main__':
     '''
     att goes from 0 to 63, 0 is most attenuation and 63 is least attenuation
@@ -155,7 +208,11 @@ if __name__=='__main__':
     ##setup board
     setup() 
 
-    bias = False #Set to false to turn off biases
+    ##read temperature and humidity
+    getTemp()
+    #read_humidity()
+    
+    bias =True #Set to false to turn off biases
     setOutput(output, bias = bias)
     
     select_waveform(wavetype)
